@@ -47,3 +47,5 @@ end
 
 
 gem "rspec-rails", "~> 6.1", :groups => [:development, :test]
+
+gem "grape", "~> 2.1"
