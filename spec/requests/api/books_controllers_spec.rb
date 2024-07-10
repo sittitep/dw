@@ -79,5 +79,65 @@ RSpec.describe "Api::BooksControllers", type: :request do
       expect(prased_response['data']['genre']).to eq('Fiction')
       expect(prased_response['data']['year']).to eq(1951)
     end
+
+    context "when required parameters are missing" do
+      it "returns an error" do
+        post "/api/books", params: {
+          genre: 'Fiction',
+          year: 1951
+        }
+
+        prased_response = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+        expect(prased_response['error']['code']).to eq("10422")
+
+        error_details = prased_response['error']['details']
+
+        expect(error_details.count).to eq(2)
+        expect(error_details["title"]).to eq("can\'t be blank")
+        expect(error_details["author"]).to eq("can\'t be blank")
+      end
+    end
+
+    context "when the book already exists" do
+      it "returns an error" do
+        post "/api/books", params: {
+          title: 'The Great Gatsby',
+          author: 'F. Scott Fitzgerald',
+          genre: 'Fiction',
+          year: 1925
+        }
+
+        prased_response = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+        expect(prased_response['error']['code']).to eq("10422")
+
+        error_details = prased_response['error']['details']
+
+        expect(error_details.count).to eq(1)
+        expect(error_details["title"]).to eq("has already been taken")
+      end
+    end
+
+    context "when the year is not valid" do
+      it "returns an error" do
+        post "/api/books", params: {
+          title: 'The Catcher in the Rye',
+          author: 'J.D. Salinger',
+          genre: 'Fiction',
+          year: 'nineteen fifty-one'
+        }
+
+        prased_response = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+
+        expect(prased_response['error']['code']).to eq("10422")
+
+        error_details = prased_response['error']['details']
+
+        expect(error_details.count).to eq(1)
+        expect(error_details["year"]).to eq("is invalid")
+      end
+    end
   end
 end

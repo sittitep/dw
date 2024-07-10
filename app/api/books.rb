@@ -3,10 +3,22 @@ ERROR_LIST = {
     code: "10404",
     message: "Record not found"
   },
+  "ActiveRecord::RecordInvalid"  => {
+    code: "10422",
+    message: "Validation errors",
+    transform: lambda do |message|
+      hash = {}
+      message.gsub("Validation failed: ", "").split(',').each do |pair|
+        key, value = pair.split(' ', 2)
+        hash[key.downcase.strip.to_sym] = value.strip
+      end
+      hash
+    end
+  },
   "Default" => {
     code: "10500",
     message: "Internal server error"
-  }  
+  }
 }.freeze
 
 class Books < Grape::API
@@ -17,9 +29,9 @@ class Books < Grape::API
     error = ERROR_LIST[e.class.name] || ERROR_LIST["Default"]
     error!({
       data: nil,
-      error: build_error(error[:code], error[:message])
+      error: build_error(error[:code], error[:message], error[:transform]&.call(e.message))
     }, 200)
-  end  
+  end
 
   helpers do
     def serialize_books(books)
@@ -70,12 +82,6 @@ class Books < Grape::API
     end  
 
     desc 'create a book'
-    params do
-      requires :title, type: String, desc: 'Book title'
-      requires :author, type: String, desc: 'Book author'
-      optional :genre, type: String, desc: 'Book genre'
-      optional :year, type: Integer, desc: 'Book year'
-    end
     post do
       book = Book.create!(
         title: params[:title],
