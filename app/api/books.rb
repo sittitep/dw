@@ -67,9 +67,6 @@ class Books < Grape::API
     end
 
     desc 'return a book'
-    params do
-      requires :id, type: Integer, desc: 'Book ID'
-    end
     route_param :id do
       get do
         book = Book.find(params[:id])
@@ -79,22 +76,44 @@ class Books < Grape::API
           error: nil
         }
       end
-    end  
+    end
 
     desc 'create a book'
     post do
-      book = Book.create!(
-        title: params[:title],
-        author: params[:author],
-        genre: params[:genre],
-        year: params[:year]
-      )
+      params do
+        optinal :title, type: String
+        optinal :author, type: String
+        optinal :genre, type: String
+        optinal :year, type: Integer
+      end
+
+      book = Book.create!(params)
 
       status 200
       {
         data: serialize_book(book),
         error: nil
       }
+    end
+
+    desc 'update a book'
+    route_param :id do
+      put do
+        params do
+          optinal :title, type: String
+          optinal :author, type: String
+          optinal :genre, type: String
+          optinal :year, type: Integer
+        end
+
+        book = Book.update!(params[:id], params)
+  
+        status 200
+        {
+          data: serialize_book(book),
+          error: nil
+        }
+      end
     end
   end
 end

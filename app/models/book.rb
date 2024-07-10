@@ -1,5 +1,5 @@
 class Book < ApplicationRecord
   validates :title, presence: true, uniqueness: { scope: :author }
   validates :author, presence: true
-  validates :year, numericality: true, format: { with: /\A\d{4}\z/ }
+  validates :year, format: { with: /\A\d{4}\z/ }, numericality: { less_than_or_equal_to: Time.now.year }
 end

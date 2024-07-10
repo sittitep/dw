@@ -136,7 +136,31 @@ RSpec.describe "Api::BooksControllers", type: :request do
         error_details = prased_response['error']['details']
 
         expect(error_details.count).to eq(1)
-        expect(error_details["year"]).to eq("is invalid")
+        expect(error_details["year"]).to eq("is not a number")
+      end
+    end
+
+    context "when the year is less than the current year" do
+      it "returns an error" do
+        current_year = Time.now.year
+        next_year = current_year + 1
+
+        post "/api/books", params: {
+          title: 'The Catcher in the Rye',
+          author: 'J.D. Salinger',
+          genre: 'Fiction',
+          year: next_year
+        }
+
+        prased_response = JSON.parse(response.body)
+        expect(response).to have_http_status(200)
+
+        expect(prased_response['error']['code']).to eq("10422")
+        
+        error_details = prased_response['error']['details']
+
+        expect(error_details.count).to eq(1)
+        expect(error_details["year"]).to eq("must be less than or equal to #{current_year}")
       end
     end
   end
