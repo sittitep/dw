@@ -11,7 +11,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
     it "returns books" do
       get "/api/books"
 
-      prased_response = JSON.parse(response.body)
+      prased_response = response.parsed_body
 
       expect(response).to have_http_status(200)
       expect(prased_response['data'].size).to eq(3)
@@ -37,7 +37,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
     it "returns a book" do
       get "/api/books/1"
 
-      prased_response = JSON.parse(response.body)
+      prased_response = response.parsed_body
 
       expect(response).to have_http_status(200)
 
@@ -51,7 +51,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
       it "returns an error" do
         get "/api/books/100"
 
-        prased_response = JSON.parse(response.body)
+        prased_response = response.parsed_body
 
         expect(response).to have_http_status(200)
         expect(prased_response['error']['code']).to eq("10404")
@@ -69,7 +69,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
         year: 1951
       }
 
-      prased_response = JSON.parse(response.body)
+      prased_response = response.parsed_body
 
       expect(response).to have_http_status(200)
       expect(Book.count).to eq(4)
@@ -87,7 +87,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
           year: 1951
         }
 
-        prased_response = JSON.parse(response.body)
+        prased_response = response.parsed_body
         expect(response).to have_http_status(200)
         expect(prased_response['error']['code']).to eq("10422")
 
@@ -108,7 +108,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
           year: 1925
         }
 
-        prased_response = JSON.parse(response.body)
+        prased_response = response.parsed_body
         expect(response).to have_http_status(200)
         expect(prased_response['error']['code']).to eq("10422")
 
@@ -128,7 +128,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
           year: 'nineteen fifty-one'
         }
 
-        prased_response = JSON.parse(response.body)
+        prased_response = response.parsed_body
         expect(response).to have_http_status(200)
 
         expect(prased_response['error']['code']).to eq("10422")
@@ -152,7 +152,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
           year: next_year
         }
 
-        prased_response = JSON.parse(response.body)
+        prased_response = response.parsed_body
         expect(response).to have_http_status(200)
 
         expect(prased_response['error']['code']).to eq("10422")
@@ -171,7 +171,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
         year: 1926
       }
 
-      prased_response = JSON.parse(response.body)
+      prased_response = response.parsed_body
 
       expect(response).to have_http_status(200)
 
@@ -185,8 +185,7 @@ RSpec.describe "Api::BooksControllers", type: :request do
   describe "DELETE /api/books/:id" do
     it "deletes a book" do
       delete "/api/books/1"
-
-      prased_response = JSON.parse(response.body)
+      prased_response = response.parsed_body
 
       expect(response).to have_http_status(200)
       expect(Book.count).to eq(2)
