@@ -44,7 +44,7 @@ class Books < Grape::API
   end
 
   resource :books do
-    desc 'Return a list of books'
+    desc 'return a list of books'
     get do
       books = Book.all
 
@@ -68,5 +68,27 @@ class Books < Grape::API
         }
       end
     end  
+
+    desc 'create a book'
+    params do
+      requires :title, type: String, desc: 'Book title'
+      requires :author, type: String, desc: 'Book author'
+      optional :genre, type: String, desc: 'Book genre'
+      optional :year, type: Integer, desc: 'Book year'
+    end
+    post do
+      book = Book.create!(
+        title: params[:title],
+        author: params[:author],
+        genre: params[:genre],
+        year: params[:year]
+      )
+
+      status 200
+      {
+        data: serialize_book(book),
+        error: nil
+      }
+    end
   end
 end
