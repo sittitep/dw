@@ -54,6 +54,14 @@ class Books < Grape::API
     def build_error(code, message, details = nil)
       { code:, message:, details: }
     end
+
+    def success!(data = nil)
+      status 200
+      {
+        data: data,
+        error: nil
+      }
+    end
   end
 
   resource :books do
@@ -72,10 +80,7 @@ class Books < Grape::API
       get do
         book = Book.find(params[:id])
 
-        {
-          data: serialize_book(book),
-          error: nil
-        }
+        success!(serialize_book(book))
       end
     end
 
@@ -90,11 +95,7 @@ class Books < Grape::API
 
       book = Book.create!(params)
 
-      status 200
-      {
-        data: serialize_book(book),
-        error: nil
-      }
+      success!(serialize_book(book))
     end
 
     desc 'update a book'
@@ -108,12 +109,8 @@ class Books < Grape::API
         end
 
         book = Book.update!(params[:id], params)
-  
-        status 200
-        {
-          data: serialize_book(book),
-          error: nil
-        }
+        
+        success!(serialize_book(book))
       end
     end
 
@@ -123,11 +120,7 @@ class Books < Grape::API
         book = Book.find(params[:id])
         book.destroy!
 
-        status 200
-        {
-          data: nil,
-          error: nil
-        }
+        success!
       end
     end
   end
