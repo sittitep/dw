@@ -32,4 +32,31 @@ RSpec.describe "Api::BooksControllers", type: :request do
       expect(prased_response['data'][2]['year']).to eq(1949)
     end
   end
+
+  describe "GET /api/books_controllers/:id" do
+    it "returns a book" do
+      get "/api/books/1"
+
+      prased_response = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+
+      expect(prased_response['data']['title']).to eq('The Great Gatsby')
+      expect(prased_response['data']['author']).to eq('F. Scott Fitzgerald')
+      expect(prased_response['data']['genre']).to eq('Fiction')
+      expect(prased_response['data']['year']).to eq(1925)
+    end
+
+    context "when the book does not exist" do
+      it "returns an error" do
+        get "/api/books/100"
+
+        prased_response = JSON.parse(response.body)
+
+        expect(response).to have_http_status(200)
+        expect(prased_response['error']['code']).to eq("10404")
+        expect(prased_response['error']['message']).to eq('Record not found')
+      end
+    end
+  end
 end
