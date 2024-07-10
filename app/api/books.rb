@@ -26,6 +26,7 @@ class Books < Grape::API
   prefix :api
 
   rescue_from Exception do |e|
+    Rails.logger.error(e)
     error = ERROR_LIST[e.class.name] || ERROR_LIST["Default"]
     error!({
       data: nil,
@@ -111,6 +112,20 @@ class Books < Grape::API
         status 200
         {
           data: serialize_book(book),
+          error: nil
+        }
+      end
+    end
+
+    desc 'delete a book'
+    route_param :id do
+      delete do
+        book = Book.find(params[:id])
+        book.destroy!
+
+        status 200
+        {
+          data: nil,
           error: nil
         }
       end

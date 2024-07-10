@@ -164,4 +164,32 @@ RSpec.describe "Api::BooksControllers", type: :request do
       end
     end
   end
+
+  describe "PUT /api/books/:id" do
+    it "updates a book" do
+      put "/api/books/1", params: {
+        year: 1926
+      }
+
+      prased_response = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+
+      expect(prased_response['data']['title']).to eq('The Great Gatsby')
+      expect(prased_response['data']['author']).to eq('F. Scott Fitzgerald')
+      expect(prased_response['data']['genre']).to eq('Fiction')
+      expect(prased_response['data']['year']).to eq(1926)
+    end
+  end
+
+  describe "DELETE /api/books/:id" do
+    it "deletes a book" do
+      delete "/api/books/1"
+
+      prased_response = JSON.parse(response.body)
+
+      expect(response).to have_http_status(200)
+      expect(Book.count).to eq(2)
+    end
+  end
 end
