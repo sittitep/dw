@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { Book } from "../types";
 import { useBookStore } from "../stores/book-store";
@@ -9,6 +9,28 @@ export type FormProps = {
   data?: Book;
   onClose?: () => void;
 };
+
+type InputProps = {
+  name: string;
+  defaultValue?: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errorMessage?: string;
+};
+
+function Input(props: InputProps) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="capitalize">{props.name}</label>
+      <input
+        type="text"
+        placeholder={props.name}
+        {...props}
+        className="border p-2"
+      />
+      <div className="h-[20px] text-sm text-red-700">{props.errorMessage}</div>
+    </div>
+  );
+}
 
 export function Form(props: FormProps) {
   const { action, data: defaultValue } = props;
@@ -36,60 +58,64 @@ export function Form(props: FormProps) {
     [action, formData]
   );
 
+  const handleOnClose = useCallback(() => {
+    setFormData({});
+    setErrors({});
+    props.onClose?.();
+  }, [props]);
+
   if (!props.display) {
     return null;
   }
 
   return (
-    <div key={props.data?.id}>
-      {formTitle}
-      <div>
-        <div>
-          <label>Title</label>
-          <input
+    <div
+      key={props.data?.id}
+      className="fixed bg-black bg-opacity-25 w-full h-full flex justify-center items-center"
+    >
+      <div className="bg-white p-6 w-2/6">
+        <div className="mb-4">
+          <span className="font-bold text-lg">{formTitle}</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Input
             name="title"
-            type="text"
-            placeholder="Title"
             defaultValue={defaultValue?.title}
             onChange={handleChange}
+            errorMessage={errors.title}
           />
-        </div>
-        <div>
-          <label>Author</label>
-          <input
+          <Input
             name="author"
-            type="text"
-            placeholder="Author"
             defaultValue={defaultValue?.author}
             onChange={handleChange}
+            errorMessage={errors.author}
           />
-        </div>
-        <div>
-          <label>Genre</label>
-          <input
+          <Input
             name="genre"
-            type="text"
-            placeholder="Genre"
             defaultValue={defaultValue?.genre}
             onChange={handleChange}
+            errorMessage={errors.genre}
           />
-        </div>
-        <div>
-          <div>
-            <label>Year</label>
-            <input
-              name="year"
-              type="number"
-              placeholder="Year"
-              defaultValue={defaultValue?.year}
-              onChange={handleChange}
-            />
+          <Input
+            name="year"
+            defaultValue={defaultValue?.year}
+            onChange={handleChange}
+            errorMessage={errors.year}
+          />
+          <div className="flex justify-between">
+            <button
+              onClick={() => handleSubmit(defaultValue?.id)}
+              className="bg-emerald-600 py-2 px-4 rounded text-white font-semibold text-sm"
+            >
+              Submit
+            </button>
+            <button
+              onClick={handleOnClose}
+              className="bg-slate-500 py-2 px-4 rounded text-white font-semibold text-sm"
+            >
+              Close
+            </button>
           </div>
-          {errors.year && <div style={{ color: "red" }}>{errors.year}</div>}
-        </div>
-        <div>
-          <button onClick={() => handleSubmit(defaultValue?.id)}>Submit</button>
-          <button onClick={props.onClose}>Close</button>
         </div>
       </div>
     </div>

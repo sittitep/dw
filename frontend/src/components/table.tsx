@@ -34,9 +34,9 @@ export const BookTable = (props: BookTableProps) => {
       {
         header: "Actions",
         cell: (info: { row: { original: Book } }) => (
-          <div>
-            <button onClick={() => onEdit(info.row.original)}>Edit</button>
-            <button onClick={() => console.log("Delete", info.row.original)}>
+          <div className="gap-4 flex">
+            <button className="text-xs py-1 px-3 rounded-lg bg-yellow-500" onClick={() => onEdit(info.row.original)}>Edit</button>
+            <button className="text-xs py-1 px-3 rounded-lg bg-red-700 text-white" onClick={() => console.log("Delete", info.row.original)}>
               Delete
             </button>
           </div>
@@ -53,12 +53,12 @@ export const BookTable = (props: BookTableProps) => {
   });
 
   return (
-    <table>
-      <thead>
+    <table className="w-full border text-sm">
+      <thead className="border-b">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id}>
+              <th key={header.id} className="p-3">
                 {header.isPlaceholder
                   ? null
                   : flexRender(
@@ -72,31 +72,15 @@ export const BookTable = (props: BookTableProps) => {
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id}>
+          <tr key={row.id} className="hover:bg-slate-200">
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>
+              <td key={cell.id} className="p-2">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        {table.getFooterGroups().map((footerGroup) => (
-          <tr key={footerGroup.id}>
-            {footerGroup.headers.map((header) => (
-              <th key={header.id}>
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(
-                      header.column.columnDef.footer,
-                      header.getContext()
-                    )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </tfoot>
     </table>
   );
 };

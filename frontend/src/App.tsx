@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
+import "./index.css";
+
 import { BookTable } from "./components/table";
 import { Form, FormProps } from "./components/form";
 
@@ -31,8 +33,10 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <BookTable books={books} onEdit={handleEditBook} />
+    <div className="flex justify-center">
+      <div className="w-3/5 pt-10">
+        <BookTable books={books} onEdit={handleEditBook} />
+      </div>
       {<Form {...form} onClose={handleClose} />}
     </div>
   );
