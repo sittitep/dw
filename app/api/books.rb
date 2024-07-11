@@ -1,23 +1,18 @@
 ERROR_LIST = {
   "ActiveRecord::RecordNotFound" => {
     code: "10404",
-    message: "Record not found"
+    message: "Record not found",
+    transform: false
   },
   "ActiveRecord::RecordInvalid"  => {
     code: "10422",
     message: "Validation errors",
-    transform: lambda do |message|
-      hash = {}
-      message.gsub("Validation failed: ", "").split(',').each do |pair|
-        key, value = pair.split(' ', 2)
-        hash[key.downcase.strip.to_sym] = value.strip
-      end
-      hash
-    end
+    transform: true
   },
   "Default" => {
     code: "10500",
-    message: "Internal server error"
+    message: "Internal server error",
+    transform: false
   }
 }.freeze
 
@@ -30,7 +25,7 @@ class Books < Grape::API
     error = ERROR_LIST[e.class.name] || ERROR_LIST["Default"]
     error!({
       data: nil,
-      error: build_error(error[:code], error[:message], error[:transform]&.call(e.message))
+      error: build_error(error[:code], error[:message], error[:transform] && transform_error_message(e.message))
     }, 200)
   end
 
@@ -53,6 +48,15 @@ class Books < Grape::API
 
     def build_error(code, message, details = nil)
       { code:, message:, details: }
+    end
+
+    def transform_error_message(message)
+      hash = {}
+      message.gsub("Validation failed: ", "").split(',').each do |pair|
+        key, value = pair.split(' ', 2)
+        hash[key.downcase.strip.to_sym] = value.strip
+      end
+      hash
     end
 
     def success!(data = nil)
