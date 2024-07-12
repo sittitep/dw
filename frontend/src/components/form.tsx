@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { Book } from "../types";
-import { useBookStore } from "../stores/book-store";
+import { useFormStore } from "../stores/form-store";
 
 export type FormProps = {
-  display: boolean;
+  display?: boolean;
   action?: "add" | "edit";
   data?: Book;
   onClose?: () => void;
@@ -18,6 +18,8 @@ type InputProps = {
 };
 
 function Input(props: InputProps) {
+  const { errorMessage } = props;
+
   return (
     <div className="flex flex-col gap-1">
       <label className="capitalize">{props.name}</label>
@@ -27,46 +29,28 @@ function Input(props: InputProps) {
         {...props}
         className="border p-2"
       />
-      <div className="h-[20px] text-sm text-red-700">{props.errorMessage}</div>
+      <div className="h-[20px] text-sm text-red-700">{errorMessage}</div>
     </div>
   );
 }
 
 export function Form(props: FormProps) {
-  const { action, data: defaultValue } = props;
-  const formTitle = action === "add" ? "Add Book" : "Edit Book";
+  const {
+    action,
+    resource: defaultValues,
+    values,
+    errors,
+    saved,
+    actions: { submit, close, updateValues },
+  } = useFormStore((state) => state);
+  const formTitle = action === "new" ? "New Book" : "Edit Book";
 
-  const [formData, setFormData] = useState<Book>({});
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }, []);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const handleSubmit = useCallback(
-    async (id?: number) => {
-      setErrors({});
-      if (action === "edit") {
-        const response = await useBookStore
-          .getState()
-          .update({ id, ...formData });
-        if (response.error) {
-          setErrors(response.error.details);
-        }
-      }
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      updateValues({ [e.target.name]: e.target.value });
     },
-    [action, formData]
+    [updateValues]
   );
-
-  const handleOnClose = useCallback(() => {
-    setFormData({});
-    setErrors({});
-    props.onClose?.();
-  }, [props]);
-
-  if (!props.display) {
-    return null;
-  }
 
   return (
     <div
@@ -80,37 +64,38 @@ export function Form(props: FormProps) {
         <div className="flex flex-col gap-2">
           <Input
             name="title"
-            defaultValue={defaultValue?.title}
+            defaultValue={defaultValues?.title}
             onChange={handleChange}
-            errorMessage={errors.title}
+            errorMessage={errors?.title}
           />
           <Input
             name="author"
-            defaultValue={defaultValue?.author}
+            defaultValue={defaultValues?.author}
             onChange={handleChange}
-            errorMessage={errors.author}
+            errorMessage={errors?.author}
           />
           <Input
             name="genre"
-            defaultValue={defaultValue?.genre}
+            defaultValue={defaultValues?.genre}
             onChange={handleChange}
-            errorMessage={errors.genre}
+            errorMessage={errors?.genre}
           />
           <Input
             name="year"
-            defaultValue={defaultValue?.year}
+            defaultValue={defaultValues?.year}
             onChange={handleChange}
-            errorMessage={errors.year}
+            errorMessage={errors?.year}
           />
           <div className="flex justify-between">
             <button
-              onClick={() => handleSubmit(defaultValue?.id)}
-              className="bg-emerald-600 py-2 px-4 rounded text-white font-semibold text-sm"
+              onClick={() => submit(action!, defaultValues?.id, values)}
+              className="bg-emerald-600 py-2 px-4 rounded text-white font-semibold text-sm disabled:opacity-50"
+              disabled={!values || saved}
             >
-              Submit
+              { saved ? 'Saved' : 'Submit' }
             </button>
             <button
-              onClick={handleOnClose}
+              onClick={close}
               className="bg-slate-500 py-2 px-4 rounded text-white font-semibold text-sm"
             >
               Close

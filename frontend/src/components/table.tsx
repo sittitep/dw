@@ -6,13 +6,18 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { useFormStore } from "../stores/form-store";
+import { useBookStore } from "../stores/book-store";
+
 type BookTableProps = {
   books: Book[];
-  onEdit: (book: Book) => void;
 };
 
 export const BookTable = (props: BookTableProps) => {
-  const { books, onEdit } = props;
+  const handleOnEdit = useFormStore((state) => state.actions.open);
+  const handleOnDelete = useBookStore((state) => state.actions.delete);
+
+  const { books } = props;
   const columns = useMemo(
     () => [
       {
@@ -35,8 +40,16 @@ export const BookTable = (props: BookTableProps) => {
         header: "Actions",
         cell: (info: { row: { original: Book } }) => (
           <div className="gap-4 flex">
-            <button className="text-xs py-1 px-3 rounded-lg bg-yellow-500" onClick={() => onEdit(info.row.original)}>Edit</button>
-            <button className="text-xs py-1 px-3 rounded-lg bg-red-700 text-white" onClick={() => console.log("Delete", info.row.original)}>
+            <button
+              className="text-xs py-1 px-3 rounded-lg bg-yellow-500"
+              onClick={() => handleOnEdit("edit", info.row.original)}
+            >
+              Edit
+            </button>
+            <button
+              className="text-xs py-1 px-3 rounded-lg bg-red-700 text-white"
+              onClick={() => handleOnDelete(info.row.original.id!)}
+            >
               Delete
             </button>
           </div>
