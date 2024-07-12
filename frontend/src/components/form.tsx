@@ -20,7 +20,6 @@ type InputProps = {
 
 export function Input(props: InputProps) {
   const { errorMessage, type } = props;
-  console.log(type)
   return (
     <div className="flex flex-col gap-1">
       <label className="capitalize">{props.name}</label>

@@ -1,9 +1,10 @@
 import axios, { AxiosInstance } from "axios";
-import { APIResponse, Book, User } from "../types";
+import { APIResponse, APIResponseError, Book, User } from "../types";
+import { useSessionStore } from "../stores/session-store";
 
 const BACKEND_URL = "http://localhost:3000/api";
 
-const axiosInstance: AxiosInstance = axios.create();
+const axiosInstance: AxiosInstance = axios.create({ baseURL: BACKEND_URL });
 
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -13,6 +14,21 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+axiosInstance.interceptors.response.use(
+  (response) => {
+    const data: APIResponseError = response?.data?.error;
+
+    if (data?.code === "10999") {
+      useSessionStore.getState().actions.logout();
+    }
+
+    return response;
+  },
+  (error) => {
+    console.log(error);
+  }
+);
+
 export class BackendClient {
   private axios: AxiosInstance;
 
@@ -21,7 +37,7 @@ export class BackendClient {
   }
 
   async login(username: string, password: string): Promise<APIResponse<User>> {
-    const res = await this.axios.post(`${BACKEND_URL}/auth/login`, {
+    const res = await this.axios.post(`/auth/login`, {
       username,
       password,
     });
@@ -29,22 +45,22 @@ export class BackendClient {
   }
 
   async listBooks(): Promise<APIResponse<Book>> {
-    const res = await this.axios.get(`${BACKEND_URL}/books`);
+    const res = await this.axios.get(`/books`);
     return res.data;
   }
 
   async createBook(book: Book): Promise<APIResponse<Book>> {
-    const res = await this.axios.post(`${BACKEND_URL}/books`, book);
+    const res = await this.axios.post(`/books`, book);
     return res.data;
   }
 
   async updateBook(book: Book): Promise<APIResponse<Book>> {
-    const res = await this.axios.put(`${BACKEND_URL}/books/${book.id}`, book);
+    const res = await this.axios.put(`/books/${book.id}`, book);
     return res.data;
   }
 
   async deleteBook(id: number): Promise<APIResponse<Book>> {
-    const res = await this.axios.delete(`${BACKEND_URL}/books/${id}`);
+    const res = await this.axios.delete(`/books/${id}`);
     return res.data;
   }
 }
