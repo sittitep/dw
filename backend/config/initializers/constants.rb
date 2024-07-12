@@ -18,7 +18,12 @@ ERROR_LIST = {
     code: "10999",
     message: "Unauthorized",
     transform: false
-  },  
+  },
+  "Throttled" => {
+    code: "10998",
+    message: "Throttled",
+    transform: false
+  },
   "Default" => {
     code: "10500",
     message: "Internal server error",
