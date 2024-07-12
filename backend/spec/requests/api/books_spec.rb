@@ -1,7 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe "Api::BooksControllers", type: :request do
+RSpec.describe "Api::Books", type: :request do
   before(:each) do
+    User.create(username: 'test', password: 'test', access_token: 'token')
+    allow_any_instance_of(Grape::Request).to receive(:headers).and_return({ 'Authorization' => 'Bearer token' })
+
     Book.create(title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', genre: 'Fiction', year: 1925)
     Book.create(title: 'To Kill a Mockingbird', author: 'Harper Lee', genre: 'Fiction', year: 1960)
     Book.create(title: '1984', author: 'George Orwell', genre: 'Fiction', year: 1949)

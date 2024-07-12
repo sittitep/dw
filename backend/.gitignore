@@ -12,7 +12,7 @@
 !/.env*.erb
 
 # Ignore all logfiles and tempfiles.
-log/*
+/log/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
@@ -31,3 +31,5 @@ log/*
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+*.sqlite3

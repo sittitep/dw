@@ -1,33 +1,13 @@
-ERROR_LIST = {
-  "ActiveRecord::RecordNotFound" => {
-    code: "10404",
-    message: "Record not found",
-    transform: false
-  },
-  "ActiveRecord::RecordInvalid"  => {
-    code: "10422",
-    message: "Validation errors",
-    transform: true
-  },
-  "Default" => {
-    code: "10500",
-    message: "Internal server error",
-    transform: false
-  }
-}.freeze
-
 class Books < Grape::API
+  include ExceptionHandler
+
+  helpers ApiBase
+  helpers AuthMiddleware
+
+  before { authenticate! }
+
   format :json
   prefix :api
-
-  rescue_from Exception do |e|
-    Rails.logger.error(e)
-    error = ERROR_LIST[e.class.name] || ERROR_LIST["Default"]
-    error!({
-      data: nil,
-      error: build_error(error[:code], error[:message], error[:transform] && transform_error_message(e.message))
-    }, 200)
-  end
 
   helpers do
     def serialize_books(books)
@@ -43,27 +23,6 @@ class Books < Grape::API
         author: book.author,
         genre: book.genre,
         year: book.year
-      }
-    end
-
-    def build_error(code, message, details = nil)
-      { code:, message:, details: }
-    end
-
-    def transform_error_message(message)
-      hash = {}
-      message.gsub("Validation failed: ", "").split(',').each do |pair|
-        key, value = pair.split(' ', 2)
-        hash[key.downcase.strip.to_sym] = value.strip
-      end
-      hash
-    end
-
-    def success!(data = nil)
-      status 200
-      {
-        data: data,
-        error: nil
       }
     end
   end
