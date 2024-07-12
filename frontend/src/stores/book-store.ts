@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 
 import { APIResponse, Book } from "../types";
+import { backendClient, BackendClient } from "../libs/backend-client";
 
 const BACKEND_URL = "http://localhost:3000/api";
 
@@ -9,9 +10,9 @@ type BookStore = {
   books: Book[];
   actions: {
     list: () => void;
-    create: (book: Book) => Promise<APIResponse>;
-    update: (book: Book) => Promise<APIResponse>;
-    delete: (id: number) => Promise<APIResponse>;
+    create: (book: Book) => Promise<APIResponse<Book>>;
+    update: (book: Book) => Promise<APIResponse<Book>>;
+    delete: (id: number) => Promise<APIResponse<Book>>;
   };
 };
 
@@ -19,35 +20,35 @@ export const useBookStore = create<BookStore>((set, get) => ({
   books: [],
   actions: {
     list: async () => {
-      const res = await axios.get(`${BACKEND_URL}/books`);
-      set({ books: res.data.data });
+      const res = await backendClient.listBooks();
+      set({ books: res.data as Book[] });
     },
-    create: async (book: Book): Promise<APIResponse> => {
-      const res = await axios.post(`${BACKEND_URL}/books`, book);
+    create: async (book: Book): Promise<APIResponse<Book>> => {
+      const res = await backendClient.createBook(book);
 
-      if (!res.data.error) {
+      if (!res.error) {
         get().actions.list();
       }
 
-      return res.data;
+      return res;
     },
-    update: async (book: Book): Promise<APIResponse> => {
-      const res = await axios.put(`${BACKEND_URL}/books/${book.id}`, book);
+    update: async (book: Book): Promise<APIResponse<Book>> => {
+      const res = await backendClient.updateBook(book);
 
-      if (!res.data.error) {
+      if (!res.error) {
         get().actions.list();
       }
 
-      return res.data;
+      return res;
     },
-    delete: async (id: number): Promise<APIResponse> => {
-      const res = await axios.delete(`${BACKEND_URL}/books/${id}`);
+    delete: async (id: number): Promise<APIResponse<Book>> => {
+      const res = await backendClient.deleteBook(id);
 
-      if (!res.data.error) {
+      if (!res.error) {
         get().actions.list();
       }
 
-      return res.data;
+      return res;
     },
   },
 }));

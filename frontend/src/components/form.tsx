@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 
 import { Book } from "../types";
 import { useFormStore } from "../stores/form-store";
@@ -12,21 +12,22 @@ export type FormProps = {
 
 type InputProps = {
   name: string;
+  type?: string;
   defaultValue?: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errorMessage?: string;
 };
 
-function Input(props: InputProps) {
-  const { errorMessage } = props;
-
+export function Input(props: InputProps) {
+  const { errorMessage, type } = props;
+  console.log(type)
   return (
     <div className="flex flex-col gap-1">
       <label className="capitalize">{props.name}</label>
       <input
-        type="text"
         placeholder={props.name}
         {...props}
+        type={type || "text"}
         className="border p-2"
       />
       <div className="h-[20px] text-sm text-red-700">{errorMessage}</div>

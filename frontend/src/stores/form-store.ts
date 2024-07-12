@@ -35,7 +35,7 @@ export const useFormStore = create<FormStore>((set, get) => ({
     submit: async (action: FormActions, id?: number, values?: Book): Promise<void> => {
       get().actions.clearErrors();
   
-      let response: APIResponse;
+      let response: APIResponse<Book>;
       const { actions } = useBookStore.getState();
   
       if (action === "edit") {
