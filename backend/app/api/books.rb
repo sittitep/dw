@@ -22,7 +22,8 @@ class Books < Grape::API
         title: book.title,
         author: book.author,
         genre: book.genre,
-        year: book.year
+        year: book.year,
+        tag_list: book.tag_list
       }
     end
   end

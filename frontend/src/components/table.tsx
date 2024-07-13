@@ -37,6 +37,10 @@ export const BookTable = (props: BookTableProps) => {
         accessorKey: "year",
       },
       {
+        header: "Tags",
+        accessorKey: "tag_list",
+      },      
+      {
         header: "Actions",
         cell: (info: { row: { original: Book } }) => (
           <div className="gap-4 flex">

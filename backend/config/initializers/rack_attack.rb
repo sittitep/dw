@@ -8,7 +8,7 @@ class Rack::Attack
   end
 
   # Return custom response for throttled requests
-  self.throttled_response = lambda do |env|
+  self.throttled_responder = lambda do |env|
     [429, {'Content-Type' => 'application/json'}, [{data: nil, error: {
       code: ERROR_LIST["Throttled"][:code],
       message: ERROR_LIST["Throttled"][:message]

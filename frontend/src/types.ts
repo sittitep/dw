@@ -4,6 +4,7 @@ export type Book = {
   author?: string;
   genre?: string;
   year?: number;
+  tag_list?: string[];
 };
 
 export type User = {

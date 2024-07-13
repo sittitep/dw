@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { startCase } from "lodash";
 
 import { Book } from "../types";
 import { useFormStore } from "../stores/form-store";
@@ -22,7 +23,7 @@ export function Input(props: InputProps) {
   const { errorMessage, type } = props;
   return (
     <div className="flex flex-col gap-1">
-      <label className="capitalize">{props.name}</label>
+      <label>{startCase(props.name)}</label>
       <input
         placeholder={props.name}
         {...props}
@@ -86,6 +87,12 @@ export function Form(props: FormProps) {
             onChange={handleChange}
             errorMessage={errors?.year}
           />
+          <Input
+            name="tag_list"
+            defaultValue={defaultValues?.tag_list?.join(",")}
+            onChange={handleChange}
+            errorMessage={errors?.yeartag_list}
+          />          
           <div className="flex justify-between">
             <button
               onClick={() => submit(action!, defaultValues?.id, values)}

@@ -53,3 +53,5 @@ gem "grape", "~> 2.1"
 gem "rack-cors", "~> 2.0"
 
 gem "rack-attack", "~> 6.7"
+
+gem "acts-as-taggable-on", "~> 10.0"
